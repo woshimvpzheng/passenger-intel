@@ -6,6 +6,7 @@ const tabs = {
   "政策监管": "政府政策、监管要求、行业通知和地方试点。",
   "风险预警": "安全监管、事故隐患、处罚整治和合规风险。",
   "信源中心": "查看当前分级监控的官方、协会、地方和行业媒体信源。",
+  "反馈": "提交错漏、信源建议和希望重点关注的经营情报方向。",
 };
 
 const state = {
@@ -17,6 +18,9 @@ const state = {
 };
 
 const el = {
+  shell: document.getElementById("shell"),
+  sidebarOpenBtn: document.getElementById("sidebarOpenBtn"),
+  sidebarCloseBtn: document.getElementById("sidebarCloseBtn"),
   nav: document.getElementById("nav"),
   pageTitle: document.getElementById("pageTitle"),
   pageSub: document.getElementById("pageSub"),
@@ -26,6 +30,7 @@ const el = {
   feedView: document.getElementById("feedView"),
   briefingView: document.getElementById("briefingView"),
   sourceView: document.getElementById("sourceView"),
+  feedbackView: document.getElementById("feedbackView"),
   articleList: document.getElementById("articleList"),
   resultMeta: document.getElementById("resultMeta"),
   statusPill: document.getElementById("statusPill"),
@@ -34,6 +39,9 @@ const el = {
   briefingSummary: document.getElementById("briefingSummary"),
   briefingSections: document.getElementById("briefingSections"),
   sourceList: document.getElementById("sourceList"),
+  feedbackForm: document.getElementById("feedbackForm"),
+  feedbackStatus: document.getElementById("feedbackStatus"),
+  feedbackSubmit: document.getElementById("feedbackSubmit"),
 };
 
 function escapeHtml(value) {
@@ -87,7 +95,20 @@ function renderActiveView() {
   el.feedView.classList.toggle("hidden", !showFeed);
   el.briefingView.classList.toggle("hidden", state.tab !== "客运日报");
   el.sourceView.classList.toggle("hidden", state.tab !== "信源中心");
+  el.feedbackView.classList.toggle("hidden", state.tab !== "反馈");
+  el.metrics.classList.toggle("hidden", state.tab === "反馈");
   el.searchInput.disabled = !showFeed;
+  el.refreshBtn.disabled = !showFeed;
+}
+
+function collapseSidebar() {
+  el.shell.classList.add("sidebar-collapsed");
+  el.sidebarOpenBtn.classList.add("visible");
+}
+
+function expandSidebar() {
+  el.shell.classList.remove("sidebar-collapsed");
+  el.sidebarOpenBtn.classList.remove("visible");
 }
 
 async function loadArticles() {
@@ -215,17 +236,44 @@ async function refreshNow() {
   }
 }
 
+async function submitFeedback(event) {
+  event.preventDefault();
+  el.feedbackSubmit.disabled = true;
+  el.feedbackStatus.textContent = "正在提交";
+  try {
+    const formData = new FormData(el.feedbackForm);
+    const response = await fetch("/", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams(formData).toString(),
+    });
+    if (!response.ok) throw new Error(`提交失败：${response.status}`);
+    el.feedbackForm.reset();
+    el.feedbackStatus.textContent = "已提交，感谢反馈。";
+  } catch (error) {
+    el.feedbackStatus.textContent = error.message;
+  } finally {
+    el.feedbackSubmit.disabled = false;
+  }
+}
+
 let searchTimer;
 el.nav.addEventListener("click", (event) => {
   const button = event.target.closest("button[data-tab]");
-  if (button) setTab(button.dataset.tab);
+  if (button) {
+    setTab(button.dataset.tab);
+    collapseSidebar();
+  }
 });
+el.sidebarCloseBtn.addEventListener("click", collapseSidebar);
+el.sidebarOpenBtn.addEventListener("click", expandSidebar);
 el.searchInput.addEventListener("input", () => {
   state.q = el.searchInput.value.trim();
   clearTimeout(searchTimer);
   searchTimer = setTimeout(loadArticles, 250);
 });
 el.refreshBtn.addEventListener("click", refreshNow);
+el.feedbackForm.addEventListener("submit", submitFeedback);
 
 Promise.all([loadArticles()]).catch((error) => {
   el.articleList.innerHTML = `<div class="empty">${escapeHtml(error.message)}</div>`;

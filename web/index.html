@@ -7,7 +7,8 @@
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
-  <div class="shell">
+  <button id="sidebarOpenBtn" class="sidebar-open" type="button" aria-label="打开导航">☰</button>
+  <div id="shell" class="shell">
     <aside class="sidebar">
       <div class="brand">
         <span class="brand-mark">客</span>
@@ -15,6 +16,7 @@
           <strong>客运情报站</strong>
           <small>Passenger Intel</small>
         </div>
+        <button id="sidebarCloseBtn" class="sidebar-close" type="button" aria-label="收起导航">×</button>
       </div>
       <nav id="nav" class="nav">
         <button data-tab="精选情报" class="active">精选情报</button>
@@ -24,6 +26,7 @@
         <button data-tab="政策监管">政策监管</button>
         <button data-tab="风险预警">风险预警</button>
         <button data-tab="信源中心">信源中心</button>
+        <button data-tab="反馈">反馈</button>
       </nav>
     </aside>
 
@@ -77,6 +80,46 @@
           </div>
         </div>
         <div id="sourceList" class="source-grid"></div>
+      </section>
+
+      <section id="feedbackView" class="view hidden">
+        <div class="feedback-panel">
+          <div class="section-head">
+            <div>
+              <h2>反馈</h2>
+              <p>记录错漏、信源建议、页面体验和经营情报需求。</p>
+            </div>
+          </div>
+          <form id="feedbackForm" class="feedback-form" name="passenger-feedback" method="POST" data-netlify="true" netlify-honeypot="bot-field">
+            <input type="hidden" name="form-name" value="passenger-feedback">
+            <p class="bot-field">
+              <label>请留空 <input name="bot-field"></label>
+            </p>
+            <div class="form-grid">
+              <label>
+                反馈类型
+                <select name="type" required>
+                  <option value="内容错漏">内容错漏</option>
+                  <option value="信源建议">信源建议</option>
+                  <option value="功能建议">功能建议</option>
+                  <option value="页面体验">页面体验</option>
+                </select>
+              </label>
+              <label>
+                联系方式
+                <input name="contact" type="text" placeholder="选填，便于后续沟通">
+              </label>
+            </div>
+            <label>
+              反馈内容
+              <textarea name="message" rows="7" required placeholder="请写下具体问题、建议的信源网址，或希望重点关注的客运经营信息。"></textarea>
+            </label>
+            <div class="feedback-actions">
+              <span id="feedbackStatus" class="feedback-status">提交后会进入 Netlify 表单记录。</span>
+              <button id="feedbackSubmit" type="submit">提交反馈</button>
+            </div>
+          </form>
+        </div>
       </section>
 
     </main>
