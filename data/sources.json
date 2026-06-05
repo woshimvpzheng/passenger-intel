@@ -1,0 +1,122 @@
+[
+  {
+    "id": "mot-news",
+    "name": "交通运输部",
+    "type": "官方",
+    "tier": "T1",
+    "region": "全国",
+    "url": "https://www.mot.gov.cn/",
+    "listUrl": "https://www.mot.gov.cn/jiaotongyaowen/",
+    "priority": 100
+  },
+  {
+    "id": "gov-policy",
+    "name": "中国政府网政策",
+    "type": "官方",
+    "tier": "T1",
+    "region": "全国",
+    "url": "https://www.gov.cn/zhengce/",
+    "listUrl": "https://www.gov.cn/zhengce/",
+    "priority": 96
+  },
+  {
+    "id": "crta",
+    "name": "中国道路运输协会",
+    "type": "行业",
+    "tier": "T1.5",
+    "region": "全国",
+    "url": "https://www.crta.org.cn/",
+    "listUrl": "https://www.crta.org.cn/",
+    "priority": 88
+  },
+  {
+    "id": "ccta",
+    "name": "中国交通运输协会",
+    "type": "行业",
+    "tier": "T1.5",
+    "region": "全国",
+    "url": "https://www.cctaw.cn/",
+    "listUrl": "https://www.cctaw.cn/",
+    "priority": 82
+  },
+  {
+    "id": "fujian-transport",
+    "name": "福建省交通运输厅",
+    "type": "地方官方",
+    "tier": "T1",
+    "region": "福建",
+    "url": "https://jtyst.fujian.gov.cn/",
+    "listUrl": "https://jtyst.fujian.gov.cn/",
+    "priority": 76
+  },
+  {
+    "id": "guangdong-transport",
+    "name": "广东省交通运输厅",
+    "type": "地方官方",
+    "tier": "T1",
+    "region": "广东",
+    "url": "https://td.gd.gov.cn/",
+    "listUrl": "https://td.gd.gov.cn/",
+    "priority": 76
+  },
+  {
+    "id": "sichuan-transport",
+    "name": "四川省交通运输厅",
+    "type": "地方官方",
+    "tier": "T1",
+    "region": "四川",
+    "url": "https://jtt.sc.gov.cn/",
+    "listUrl": "https://jtt.sc.gov.cn/",
+    "priority": 74
+  },
+  {
+    "id": "zhejiang-transport",
+    "name": "浙江省交通运输厅",
+    "type": "地方官方",
+    "tier": "T1",
+    "region": "浙江",
+    "url": "https://jtyst.zj.gov.cn/",
+    "listUrl": "https://jtyst.zj.gov.cn/",
+    "priority": 74
+  },
+  {
+    "id": "jiangsu-transport",
+    "name": "江苏省交通运输厅",
+    "type": "地方官方",
+    "tier": "T1",
+    "region": "江苏",
+    "url": "https://jtyst.jiangsu.gov.cn/",
+    "listUrl": "https://jtyst.jiangsu.gov.cn/",
+    "priority": 74
+  },
+  {
+    "id": "henan-transport",
+    "name": "河南省交通运输厅",
+    "type": "地方官方",
+    "tier": "T1",
+    "region": "河南",
+    "url": "https://jtyst.henan.gov.cn/",
+    "listUrl": "https://jtyst.henan.gov.cn/",
+    "priority": 72
+  },
+  {
+    "id": "hunan-transport",
+    "name": "湖南省交通运输厅",
+    "type": "地方官方",
+    "tier": "T1",
+    "region": "湖南",
+    "url": "https://jtt.hunan.gov.cn/",
+    "listUrl": "https://jtt.hunan.gov.cn/",
+    "priority": 72
+  },
+  {
+    "id": "transport-news",
+    "name": "中国交通新闻网",
+    "type": "行业媒体",
+    "tier": "T2",
+    "region": "全国",
+    "url": "https://www.zgjtb.com/",
+    "listUrl": "https://www.zgjtb.com/",
+    "priority": 65
+  }
+]
