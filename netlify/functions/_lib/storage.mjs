@@ -1,6 +1,6 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import { isNetlify, isProductionDeploy } from "./env.mjs";
+import { isNetlify, isProductionDeploy, isServerlessRuntime } from "./env.mjs";
 
 const root = globalThis.process?.cwd?.() || "F:/制作自动捕捉网站";
 const localDir = path.join(root, ".netlify-local");
@@ -15,13 +15,16 @@ async function sampleState() {
 }
 
 async function getBlobStore() {
-  if (!isNetlify()) return null;
   try {
     const { getStore, getDeployStore } = await import("@netlify/blobs");
-    return isProductionDeploy() ? getStore(storeName, { consistency: "strong" }) : getDeployStore(storeName);
+    return isProductionDeploy() ? getStore(storeName) : getDeployStore(storeName);
   } catch {
     return null;
   }
+}
+
+function canWriteLocalCache() {
+  return !isNetlify() && !isServerlessRuntime();
 }
 
 async function readLocalState() {
@@ -30,7 +33,7 @@ async function readLocalState() {
     return JSON.parse(raw);
   } catch {
     const initial = await sampleState();
-    await writeLocalState(initial);
+    if (canWriteLocalCache()) await writeLocalState(initial);
     return initial;
   }
 }
@@ -49,6 +52,7 @@ export async function readState() {
     await store.setJSON(stateKey, initial);
     return initial;
   }
+  if (!canWriteLocalCache()) return await sampleState();
   return readLocalState();
 }
 
@@ -59,6 +63,7 @@ export async function writeState(state) {
     await store.setJSON(stateKey, normalized);
     return normalized;
   }
+  if (!canWriteLocalCache()) return normalized;
   await writeLocalState(normalized);
   return normalized;
 }
