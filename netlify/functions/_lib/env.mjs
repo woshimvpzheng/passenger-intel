@@ -1,6 +1,6 @@
 export function env(name, fallback = "") {
-  const netlifyEnv = globalThis.Netlify?.env;
-  if (netlifyEnv?.get) return netlifyEnv.get(name) || fallback;
+  const netlifyValue = globalThis.Netlify?.env?.get?.(name);
+  if (netlifyValue) return netlifyValue;
   return globalThis.process?.env?.[name] || fallback;
 }
 
