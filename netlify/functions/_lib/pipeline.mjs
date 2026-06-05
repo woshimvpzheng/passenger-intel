@@ -9,7 +9,7 @@ import { env } from "./env.mjs";
 
 const MAX_SOURCES_PER_RUN = Number(env("MAX_SOURCES_PER_RUN", "2"));
 const MAX_NEW_ARTICLES_PER_RUN = Number(env("MAX_NEW_ARTICLES_PER_RUN", "6"));
-const MAX_AI_CALLS_PER_RUN = Number(env("MAX_AI_CALLS_PER_RUN", "4"));
+const MAX_AI_CALLS_PER_RUN = Number(env("MAX_AI_CALLS_PER_RUN", "2"));
 const MAX_ARTICLES_STORED = Number(env("MAX_ARTICLES_STORED", "300"));
 
 export async function refreshPipeline(mode = "manual") {
