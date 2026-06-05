@@ -17,6 +17,12 @@ export default async function status() {
       sources: sources.length,
       latestLog,
       aiConfigured: aiConfigured(),
+      aiProbe: {
+        processEnv: Boolean(globalThis.process?.env),
+        processKey: Boolean(globalThis.process?.env?.AI_API_KEY),
+        netlifyEnv: Boolean(globalThis.Netlify?.env?.get),
+        netlifyKey: Boolean(globalThis.Netlify?.env?.get?.("AI_API_KEY")),
+      },
       storage: isNetlify() ? "Netlify Blobs" : "本地预览缓存",
       schedule: "北京时间 7:00、9:00、11:00、13:00、15:00、17:00",
     },
