@@ -79,13 +79,10 @@ function scoreClass(item) {
   return "";
 }
 
-function isSpecificUrl(value) {
+function hasUsableUrl(value) {
   try {
     const url = new URL(value);
-    const parts = url.pathname.split("/").filter(Boolean);
-    if (!parts.length) return false;
-    if (/^(index|home)\.(html?|shtml|jhtml)$/i.test(parts.at(-1)) && parts.length <= 2) return false;
-    return parts.length >= 2 || /\.(html|shtml|jhtml|htm|pdf)$/i.test(url.pathname) || url.search.length > 8;
+    return url.protocol === "http:" || url.protocol === "https:";
   } catch {
     return false;
   }
@@ -93,8 +90,13 @@ function isSpecificUrl(value) {
 
 function articleTitle(item) {
   const title = escapeHtml(item.title);
-  if (!isSpecificUrl(item.url)) return `<span class="article-title">${title}</span>`;
+  if (!hasUsableUrl(item.url)) return `<span class="article-title">${title}</span>`;
   return `<a href="${escapeHtml(item.url)}" target="_blank" rel="noopener">${title}</a>`;
+}
+
+function originalLink(item) {
+  if (!hasUsableUrl(item.url)) return "";
+  return `<a class="original-link" href="${escapeHtml(item.url)}" target="_blank" rel="noopener">查看原文</a>`;
 }
 
 function setTab(tab) {
@@ -187,6 +189,7 @@ function renderArticles() {
           ${item.featured ? `<span class="tag featured">精选</span>` : ""}
           ${(item.tags || []).map((tag) => `<span class="tag">${escapeHtml(tag)}</span>`).join("")}
         </div>
+        <div class="article-actions">${originalLink(item)}</div>
       </div>
       <div class="score ${scoreClass(item)}">${item.score}<small>质量分</small></div>
     </article>
@@ -212,7 +215,7 @@ function renderBriefing() {
           <div class="brief-reason">经营判断：${escapeHtml(item.reason || "建议持续关注后续进展。")}</div>
           <div class="brief-foot">
             <span>${escapeHtml(item.sourceName)} · ${escapeHtml(item.sourceTier)} · ${escapeHtml(item.region)}</span>
-            ${isSpecificUrl(item.url) ? `<a href="${escapeHtml(item.url)}" target="_blank" rel="noopener">查看原文</a>` : `<span>暂无详情链接</span>`}
+            ${originalLink(item)}
           </div>
         </article>
       `).join("")}

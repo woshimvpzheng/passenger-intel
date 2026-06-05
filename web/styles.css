@@ -330,6 +330,29 @@ textarea:focus {
 .article a:hover { color: var(--cyan); }
 .article-title { display: inline-block; }
 
+.article-actions {
+  display: flex;
+  margin-top: 12px;
+}
+
+.article a.original-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 0 12px;
+  border: 1px solid rgba(34, 211, 238, 0.34);
+  border-radius: 8px;
+  color: var(--cyan);
+  background: rgba(34, 211, 238, 0.08);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.article a.original-link:hover {
+  color: #06121e;
+  background: var(--cyan);
+}
+
 .meta {
   color: var(--muted);
   font-size: 13px;
