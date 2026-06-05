@@ -6,6 +6,7 @@ import {
   isRelevantPassengerNews,
   mergeArticles,
 } from "../netlify/functions/_lib/rules.mjs";
+import { extractLinks } from "../netlify/functions/_lib/fetcher.mjs";
 
 const t1Source = {
   id: "mot-news",
@@ -60,6 +61,38 @@ test("同行经营案例能进入经营借鉴", () => {
   assert.ok(article.reason.includes("经营"));
 });
 
+test("广东通勤班车采购能进入招标采购", () => {
+  const article = enrichCandidate({
+    title: "广东某单位通勤班车租赁服务采购公告",
+    content: "项目采购上下班班车、员工通勤接送和大巴车辆租赁服务，服务地点在广东省内。",
+    region: "广东",
+    url: "https://example.com/tender/detail.html",
+  }, {
+    id: "gd-gov-purchase",
+    name: "广东省政府采购网",
+    tier: "T1.5",
+    type: "招标采购",
+    region: "广东",
+  });
+  assert.equal(article.category, "招标采购");
+  assert.equal(article.featured, true);
+  assert.ok(article.score >= 70);
+});
+
+test("抓取链接时跳过首页并保留详情页", () => {
+  const links = extractLinks(`
+    <a href="/">广东省政府采购网首页</a>
+    <a href="/notice/">采购公告列表</a>
+    <span>2026-06-05</span><a href="/notice/202606/t20260605_123456.html">员工通勤班车租赁服务采购公告</a>
+  `, {
+    url: "https://gdgpo.czt.gd.gov.cn/",
+    listUrl: "https://gdgpo.czt.gd.gov.cn/notice/",
+  });
+  assert.equal(links.length, 1);
+  assert.equal(links[0].url, "https://gdgpo.czt.gd.gov.cn/notice/202606/t20260605_123456.html");
+  assert.equal(links[0].publishedAt, "2026-06-05");
+});
+
 test("相似标题能聚类为同一事件", () => {
   const a = enrichCandidate({
     title: "某市客运班线恢复运营并优化发车班次",
@@ -76,4 +109,3 @@ test("相似标题能聚类为同一事件", () => {
   assert.equal(clusters.length, 1);
   assert.equal(clusters[0].count, 2);
 });
-

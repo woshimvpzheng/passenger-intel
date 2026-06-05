@@ -77,6 +77,36 @@
       },
       "score": 90,
       "featured": true
+    },
+    {
+      "id": "sample-tender-001",
+      "clusterId": "cluster-guangdong-commute-tender",
+      "title": "生产人员通勤班车租赁服务项目结果公告",
+      "sourceId": "gd-gov-purchase",
+      "sourceName": "广东省政府采购网",
+      "sourceTier": "T1.5",
+      "sourceType": "招标采购",
+      "region": "广东",
+      "url": "https://nr.gd.gov.cn/zwgknew/ygzj/zfcg/content/post_4713906.html",
+      "publishedAt": "2026-06-05T10:20:00+08:00",
+      "fetchedAt": "2026-06-05T10:30:00+08:00",
+      "category": "招标采购",
+      "summary": "广东省内通勤班车租赁服务采购结果，可用于观察企事业单位上下班接送、车辆配置和服务周期需求。",
+      "reason": "涉及通勤班车租赁采购机会，建议关注线路半径、车辆规模、服务期限、报价边界和履约风险。",
+      "tags": [
+        "广东招标",
+        "通勤班车",
+        "车辆租赁"
+      ],
+      "dimensions": {
+        "policyImpact": 42,
+        "businessValue": 88,
+        "riskLevel": 34,
+        "timeliness": 82,
+        "sourceAuthority": 78
+      },
+      "score": 82,
+      "featured": true
     }
   ],
   "clusters": [],

@@ -3,6 +3,7 @@ const tabs = {
   "全部动态": "保留抓取到的国内道路客运相关信息，按时间和分数排序。",
   "客运日报": "过去 24 小时精选内容按板块整理，适合早会快速浏览。",
   "经营借鉴": "同行转型、客运站复合经营、定制客运和交旅融合案例。",
+  "广东招标": "广东省内通勤、上下班班车、车辆租赁和包车采购机会。",
   "政策监管": "政府政策、监管要求、行业通知和地方试点。",
   "风险预警": "安全监管、事故隐患、处罚整治和合规风险。",
   "信源中心": "查看当前分级监控的官方、协会、地方和行业媒体信源。",
@@ -25,7 +26,6 @@ const el = {
   pageTitle: document.getElementById("pageTitle"),
   pageSub: document.getElementById("pageSub"),
   searchInput: document.getElementById("searchInput"),
-  refreshBtn: document.getElementById("refreshBtn"),
   metrics: document.getElementById("metrics"),
   feedView: document.getElementById("feedView"),
   briefingView: document.getElementById("briefingView"),
@@ -79,26 +79,43 @@ function scoreClass(item) {
   return "";
 }
 
+function isSpecificUrl(value) {
+  try {
+    const url = new URL(value);
+    const parts = url.pathname.split("/").filter(Boolean);
+    if (!parts.length) return false;
+    if (/^(index|home)\.(html?|shtml|jhtml)$/i.test(parts.at(-1)) && parts.length <= 2) return false;
+    return parts.length >= 2 || /\.(html|shtml|jhtml|htm|pdf)$/i.test(url.pathname) || url.search.length > 8;
+  } catch {
+    return false;
+  }
+}
+
+function articleTitle(item) {
+  const title = escapeHtml(item.title);
+  if (!isSpecificUrl(item.url)) return `<span class="article-title">${title}</span>`;
+  return `<a href="${escapeHtml(item.url)}" target="_blank" rel="noopener">${title}</a>`;
+}
+
 function setTab(tab) {
   state.tab = tab;
   el.pageTitle.textContent = tab;
   el.pageSub.textContent = tabs[tab];
   el.nav.querySelectorAll("button").forEach((button) => button.classList.toggle("active", button.dataset.tab === tab));
   renderActiveView();
-  if (["精选情报", "全部动态", "经营借鉴", "政策监管", "风险预警"].includes(tab)) loadArticles();
+  if (["精选情报", "全部动态", "经营借鉴", "广东招标", "政策监管", "风险预警"].includes(tab)) loadArticles();
   if (tab === "客运日报") loadBriefing();
   if (tab === "信源中心") loadSources();
 }
 
 function renderActiveView() {
-  const showFeed = ["精选情报", "全部动态", "经营借鉴", "政策监管", "风险预警"].includes(state.tab);
+  const showFeed = ["精选情报", "全部动态", "经营借鉴", "广东招标", "政策监管", "风险预警"].includes(state.tab);
   el.feedView.classList.toggle("hidden", !showFeed);
   el.briefingView.classList.toggle("hidden", state.tab !== "客运日报");
   el.sourceView.classList.toggle("hidden", state.tab !== "信源中心");
   el.feedbackView.classList.toggle("hidden", state.tab !== "反馈");
   el.metrics.classList.toggle("hidden", state.tab === "反馈");
   el.searchInput.disabled = !showFeed;
-  el.refreshBtn.disabled = !showFeed;
 }
 
 function collapseSidebar() {
@@ -161,7 +178,7 @@ function renderArticles() {
     <article class="article">
       <div class="time">${formatTime(item.publishedAt)}</div>
       <div>
-        <a href="${escapeHtml(item.url)}" target="_blank" rel="noopener">${escapeHtml(item.title)}</a>
+        ${articleTitle(item)}
         <div class="meta">${escapeHtml(item.sourceName)} · ${escapeHtml(item.sourceTier)} · ${escapeHtml(item.region)}</div>
         <p class="summary">${escapeHtml(item.summary)}</p>
         <div class="reason">${escapeHtml(item.reason)}</div>
@@ -195,7 +212,7 @@ function renderBriefing() {
           <div class="brief-reason">经营判断：${escapeHtml(item.reason || "建议持续关注后续进展。")}</div>
           <div class="brief-foot">
             <span>${escapeHtml(item.sourceName)} · ${escapeHtml(item.sourceTier)} · ${escapeHtml(item.region)}</span>
-            <a href="${escapeHtml(item.url)}" target="_blank" rel="noopener">查看原文</a>
+            ${isSpecificUrl(item.url) ? `<a href="${escapeHtml(item.url)}" target="_blank" rel="noopener">查看原文</a>` : `<span>暂无详情链接</span>`}
           </div>
         </article>
       `).join("")}
@@ -219,21 +236,6 @@ function formatPlainTime(value) {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value;
   return new Intl.DateTimeFormat("zh-CN", { hour: "2-digit", minute: "2-digit", hour12: false }).format(date);
-}
-
-async function refreshNow() {
-  el.refreshBtn.disabled = true;
-  el.refreshBtn.textContent = "刷新中";
-  try {
-    const result = await api("/.netlify/functions/refresh", { method: "POST" });
-    el.statusPill.textContent = result.log?.message || "刷新完成";
-    await loadArticles();
-  } catch (error) {
-    el.statusPill.textContent = error.message;
-  } finally {
-    el.refreshBtn.disabled = false;
-    el.refreshBtn.textContent = "立即刷新";
-  }
 }
 
 async function submitFeedback(event) {
@@ -272,7 +274,6 @@ el.searchInput.addEventListener("input", () => {
   clearTimeout(searchTimer);
   searchTimer = setTimeout(loadArticles, 250);
 });
-el.refreshBtn.addEventListener("click", refreshNow);
 el.feedbackForm.addEventListener("submit", submitFeedback);
 
 Promise.all([loadArticles()]).catch((error) => {

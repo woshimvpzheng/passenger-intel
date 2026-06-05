@@ -73,18 +73,44 @@ export function extractLinks(html, source) {
     if (!title || title.length < 6 || title.length > 80) continue;
     const url = absolutizeUrl(href, base);
     if (!url || !/^https?:\/\//.test(url)) continue;
+    if (!isDetailUrl(url, source)) continue;
     if (links.some((item) => item.url === url || item.title === title)) continue;
-    links.push({ title, url });
+    links.push({ title, url, publishedAt: extractNearbyDate(html, match.index) });
   }
   return links;
 }
 
 function absolutizeUrl(href, base) {
+  if (!href || /^(javascript:|mailto:|tel:|#)/i.test(href.trim())) return "";
   try {
     return new URL(href, base).toString();
   } catch {
     return "";
   }
+}
+
+function isDetailUrl(url, source) {
+  try {
+    const target = new URL(url);
+    const home = new URL(source.url);
+    const list = new URL(source.listUrl || source.url);
+    const normalizedPath = target.pathname.replace(/\/+$/, "");
+    if (!normalizedPath || normalizedPath === home.pathname.replace(/\/+$/, "") || normalizedPath === list.pathname.replace(/\/+$/, "")) return false;
+    if (target.origin === home.origin && [home.pathname, list.pathname].map((item) => item.replace(/\/+$/, "") || "/").includes(normalizedPath || "/")) return false;
+    if (/\.(jpg|jpeg|png|gif|svg|css|js|zip|rar)$/i.test(target.pathname)) return false;
+    if (/\.(html|shtml|jhtml|htm|pdf)$/i.test(target.pathname)) return true;
+    if (/[?&](id|article|notice|info|content|project|guid|uuid)=/i.test(target.search)) return true;
+    return target.pathname.split("/").filter(Boolean).length >= 2;
+  } catch {
+    return false;
+  }
+}
+
+function extractNearbyDate(html, index) {
+  const chunk = html.slice(Math.max(0, index - 180), Math.min(html.length, index + 220));
+  const text = normalizeText(chunk);
+  const match = text.match(/20\d{2}[-/年]\d{1,2}[-/月]\d{1,2}/);
+  return match ? match[0].replace("年", "-").replace("月", "-").replace("日", "").replaceAll("/", "-") : "";
 }
 
 export function extractArticleText(html) {

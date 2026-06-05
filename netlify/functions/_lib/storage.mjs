@@ -1,6 +1,6 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import { isNetlify, isProductionDeploy, isServerlessRuntime } from "./env.mjs";
+import { isNetlify, isServerlessRuntime } from "./env.mjs";
 
 const root = globalThis.process?.cwd?.() || "F:/制作自动捕捉网站";
 const localDir = path.join(root, ".netlify-local");
@@ -15,9 +15,10 @@ async function sampleState() {
 }
 
 async function getBlobStore() {
+  if (!isNetlify()) return null;
   try {
-    const { getStore, getDeployStore } = await import("@netlify/blobs");
-    return isProductionDeploy() ? getStore(storeName) : getDeployStore(storeName);
+    const { getStore } = await import("@netlify/blobs");
+    return getStore(storeName);
   } catch {
     return null;
   }

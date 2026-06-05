@@ -22,11 +22,6 @@
   status = 200
 
 [[redirects]]
-  from = "/api/refresh"
-  to = "/.netlify/functions/refresh"
-  status = 200
-
-[[redirects]]
   from = "/api/status"
   to = "/.netlify/functions/status"
   status = 200
