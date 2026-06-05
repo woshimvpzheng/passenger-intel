@@ -48,12 +48,12 @@ export async function readState() {
   const store = await getBlobStore();
   if (store) {
     const state = await store.get(stateKey, { type: "json" });
-    if (state) return state;
+    if (state) return normalizeState(state);
     const initial = await sampleState();
     await store.setJSON(stateKey, initial);
-    return initial;
+    return normalizeState(initial);
   }
-  if (!canWriteLocalCache()) return await sampleState();
+  if (!canWriteLocalCache()) return normalizeState(await sampleState());
   return readLocalState();
 }
 
@@ -71,10 +71,26 @@ export async function writeState(state) {
 
 export function normalizeState(state = {}) {
   return {
-    articles: Array.isArray(state.articles) ? state.articles : [],
+    articles: Array.isArray(state.articles) ? state.articles.filter((article) => isArticleDetailUrl(article?.url)) : [],
     clusters: Array.isArray(state.clusters) ? state.clusters : [],
     briefing: state.briefing || null,
     logs: Array.isArray(state.logs) ? state.logs : [],
     cursor: Number.isInteger(state.cursor) ? state.cursor : 0,
   };
+}
+
+export function isArticleDetailUrl(value = "") {
+  try {
+    const url = new URL(value);
+    if (!["http:", "https:"].includes(url.protocol)) return false;
+    const parts = url.pathname.split("/").filter(Boolean);
+    const last = parts.at(-1) || "";
+    if (!parts.length) return false;
+    if (/^(index|default|home)\.(html?|shtml|jhtml)$/i.test(last) && parts.length <= 2) return false;
+    if (/\.(html|shtml|jhtml|htm|pdf)$/i.test(last)) return true;
+    if (/[?&](id|article|notice|info|content|project|guid|uuid|contentId)=/i.test(url.search)) return true;
+    return parts.length >= 3 && !/^(list|news|zhengce|index)$/i.test(last);
+  } catch {
+    return false;
+  }
 }

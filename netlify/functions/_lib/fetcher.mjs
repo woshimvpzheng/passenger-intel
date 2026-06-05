@@ -68,7 +68,7 @@ export function extractLinks(html, source) {
   const anchorPattern = /<a\b[^>]*href=["']([^"']+)["'][^>]*>([\s\S]*?)<\/a>/gi;
   let match;
   while ((match = anchorPattern.exec(html))) {
-    const href = match[1];
+    const href = decodeHtmlAttribute(match[1]);
     const title = normalizeText(match[2]).replace(/\s+/g, "");
     if (!title || title.length < 6 || title.length > 80) continue;
     const url = absolutizeUrl(href, base);
@@ -87,6 +87,15 @@ function absolutizeUrl(href, base) {
   } catch {
     return "";
   }
+}
+
+function decodeHtmlAttribute(value = "") {
+  return String(value)
+    .replace(/&amp;/g, "&")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">");
 }
 
 function isDetailUrl(url, source) {

@@ -7,6 +7,7 @@ import {
   mergeArticles,
 } from "../netlify/functions/_lib/rules.mjs";
 import { extractLinks } from "../netlify/functions/_lib/fetcher.mjs";
+import { normalizeState } from "../netlify/functions/_lib/storage.mjs";
 
 const t1Source = {
   id: "mot-news",
@@ -91,6 +92,27 @@ test("抓取链接时跳过首页并保留详情页", () => {
   assert.equal(links.length, 1);
   assert.equal(links[0].url, "https://gdgpo.czt.gd.gov.cn/notice/202606/t20260605_123456.html");
   assert.equal(links[0].publishedAt, "2026-06-05");
+});
+
+test("抓取链接会还原网页编码后的详情页地址", () => {
+  const links = extractLinks(`
+    <a href="/detail.html?id=4&amp;contentId=2229">道路客运分会工作动态</a>
+  `, {
+    url: "https://www.crta.org.cn/",
+    listUrl: "https://www.crta.org.cn/",
+  });
+  assert.equal(links.length, 1);
+  assert.equal(links[0].url, "https://www.crta.org.cn/detail.html?id=4&contentId=2229");
+});
+
+test("缓存读取时过滤只有首页链接的旧信息", () => {
+  const state = normalizeState({
+    articles: [
+      { id: "home", url: "https://www.mot.gov.cn/" },
+      { id: "detail", url: "https://www.mot.gov.cn/jiaotongyaowen/202601/t20260104_4195714.html" },
+    ],
+  });
+  assert.deepEqual(state.articles.map((item) => item.id), ["detail"]);
 });
 
 test("相似标题能聚类为同一事件", () => {
