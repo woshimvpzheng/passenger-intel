@@ -14,7 +14,7 @@ export async function analyzeWithAI(candidate, source) {
   if (!aiConfigured()) return null;
   const provider = env("AI_PROVIDER", "glm");
   const baseUrl = (env("AI_BASE_URL") || defaultBaseUrls[provider] || "").replace(/\/$/, "");
-  const model = env("AI_MODEL");
+  const model = env("AI_MODEL", provider === "glm" ? "glm-4.7" : "");
   if (!baseUrl || !model) return null;
 
   const prompt = [
