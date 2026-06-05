@@ -92,21 +92,21 @@ function renderActiveView() {
 
 async function loadArticles() {
   const params = new URLSearchParams({ tab: state.tab, q: state.q });
-  const data = await api(`/api/articles?${params.toString()}`);
+  const data = await api(`/.netlify/functions/articles?${params.toString()}`);
   state.articles = data.articles || [];
   renderMetrics();
   renderArticles();
 }
 
 async function loadBriefing() {
-  const data = await api("/api/briefing");
+  const data = await api("/.netlify/functions/briefing");
   state.briefing = data.briefing;
   renderMetrics();
   renderBriefing();
 }
 
 async function loadSources() {
-  const data = await api("/api/sources");
+  const data = await api("/.netlify/functions/sources");
   state.sources = data.sources || [];
   renderSources();
 }
@@ -204,7 +204,7 @@ async function refreshNow() {
   el.refreshBtn.disabled = true;
   el.refreshBtn.textContent = "刷新中";
   try {
-    const result = await api("/api/refresh", { method: "POST" });
+    const result = await api("/.netlify/functions/refresh", { method: "POST" });
     el.statusPill.textContent = result.log?.message || "刷新完成";
     await loadArticles();
   } catch (error) {
